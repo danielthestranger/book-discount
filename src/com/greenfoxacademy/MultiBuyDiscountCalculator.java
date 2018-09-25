@@ -68,7 +68,7 @@ public class MultiBuyDiscountCalculator {
                                 .sum();
             }
 
-            discountedTotalForTriedMaxBundleSize = getDiscountedCostForBundles(bundlesAtFullPriceForTriedMaxBundleSize);
+            discountedTotalForTriedMaxBundleSize = getDiscountedTotalForBundles(bundlesAtFullPriceForTriedMaxBundleSize);
 
 //            System.out.println("Tried max bundle size: " + triedMaxBundleSize);
 //            System.out.println("Cost: " + discountedTotalForTriedMaxBundleSize);
@@ -87,20 +87,20 @@ public class MultiBuyDiscountCalculator {
         return lowestDiscountedTotal;
     }
 
-    private Double getDiscountedCostForBundles(List<Pair<Integer, Double>> bundleSizesWithFullPrice) {
-        Double overallCost = 0.;
+    private Double getDiscountedTotalForBundles(List<Pair<Integer, Double>> bundleSizesWithFullPrice) {
+        Double discountedTotal = 0.;
 
         Double fullPriceOfBundle = 0.;
         Integer bundleSize = 0;
         for (Pair<Integer, Double> oneBundleWithFullPrice : bundleSizesWithFullPrice) {
             fullPriceOfBundle = oneBundleWithFullPrice.getValue();
             bundleSize = oneBundleWithFullPrice.getKey();
-            overallCost += getDiscountedCostForBundle(bundleSize, fullPriceOfBundle);
+            discountedTotal += getDiscountedTotalForBundle(bundleSize, fullPriceOfBundle);
         }
-        return overallCost;
+        return discountedTotal;
     }
 
-    private Double getDiscountedCostForBundle(Integer bundleSize, Double fullPriceOfBundle) {
+    private Double getDiscountedTotalForBundle(Integer bundleSize, Double fullPriceOfBundle) {
         return  multiBuyDiscountMultipliers.get(bundleSize) * fullPriceOfBundle;
     }
 
