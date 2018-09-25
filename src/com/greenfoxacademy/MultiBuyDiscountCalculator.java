@@ -10,9 +10,12 @@ import java.util.Map;
 public class MultiBuyDiscountCalculator {
 
     private Map<Integer, Double> multiBuyDiscountMultipliers;
+    private Map<OrderItem, Integer> orderItemHistogram;
 
-    public MultiBuyDiscountCalculator(Map<Integer, Double> multiBuyDiscountMultipliers) {
+    public MultiBuyDiscountCalculator(Map<Integer, Double> multiBuyDiscountMultipliers,
+                                      Map<OrderItem, Integer> orderItemHistogram) {
         this.multiBuyDiscountMultipliers = multiBuyDiscountMultipliers;
+        this.orderItemHistogram = orderItemHistogram;
     }
 
     /** For each possible max bundle size, it internally creates a list of achievable bundles.
@@ -21,10 +24,9 @@ public class MultiBuyDiscountCalculator {
      *
      *  For each such bundle combination, it determines which combination has the lowest overall price.
      *
-     * @param orderItemHistogram expects OrderItem as keys and their respective counts as values
      * @return The lowest total cost for the optimum bundle combination.
      */
-    public Double getLowestCostForBundles(Map<OrderItem, Integer> orderItemHistogram) {
+    public Double getDiscountedTotalPrice() {
         Double lowestOverallCost = Double.MAX_VALUE;
         int histogramSize = orderItemHistogram.size();
 

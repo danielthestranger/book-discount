@@ -32,79 +32,83 @@ class MultiBuyDiscountTests {
 
     @Test
     public void oneItemCostsFullPrice() {
-        Map<OrderItem, Integer> orderHistogram = new HashMap<>();
-        orderHistogram.put(orderItems.get(1), 1);
+        Map<OrderItem, Integer> orderItemHistogram = new HashMap<>();
+        orderItemHistogram.put(orderItems.get(1), 1);
+        MultiBuyDiscountCalculator calculator =
+                new MultiBuyDiscountCalculator(multiBuyDiscountMultipliers, orderItemHistogram);
 
-        MultiBuyDiscountCalculator calculator = new MultiBuyDiscountCalculator(multiBuyDiscountMultipliers);
-
-        Double result = calculator.getLowestCostForBundles(orderHistogram);
+        Double result = calculator.getDiscountedTotalPrice();
         assertEquals(orderItems.get(1).getUnitPrice(), result, 0.1);
     }
 
     @Test
     public void twoItemsOfTheSameUseNoDiscount() {
-        Map<OrderItem, Integer> orderHistogram = new HashMap<>();
-        orderHistogram.put(orderItems.get(1), 2);
-        MultiBuyDiscountCalculator calculator = new MultiBuyDiscountCalculator(multiBuyDiscountMultipliers);
-
-        Double result = calculator.getLowestCostForBundles(orderHistogram);
+        Map<OrderItem, Integer> orderItemHistogram = new HashMap<>();
+        orderItemHistogram.put(orderItems.get(1), 2);
+        MultiBuyDiscountCalculator calculator =
+                new MultiBuyDiscountCalculator(multiBuyDiscountMultipliers, orderItemHistogram);
+        
+        Double result = calculator.getDiscountedTotalPrice();
         assertEquals(orderItems.get(1).getUnitPrice() * 2, result, 0.1);
     }
 
     @Test
     public void twoDifferentItemsUseLevel1Discount() {
-        Map<OrderItem, Integer> orderHistogram = new HashMap<>();
-        orderHistogram.put(orderItems.get(1), 1);
-        orderHistogram.put(orderItems.get(2), 1);
-        MultiBuyDiscountCalculator calculator = new MultiBuyDiscountCalculator(multiBuyDiscountMultipliers);
+        Map<OrderItem, Integer> orderItemHistogram = new HashMap<>();
+        orderItemHistogram.put(orderItems.get(1), 1);
+        orderItemHistogram.put(orderItems.get(2), 1);
+        MultiBuyDiscountCalculator calculator =
+                new MultiBuyDiscountCalculator(multiBuyDiscountMultipliers, orderItemHistogram);
 
-        Double result = calculator.getLowestCostForBundles(orderHistogram);
+        Double result = calculator.getDiscountedTotalPrice();
         assertEquals((orderItems.get(1).getUnitPrice() + orderItems.get(2).getUnitPrice()) * 0.95, result, 0.1);
     }
 
     @Test
     public void ThreeTimes2_and_2times1_items_AreBundledInto4s() {
-        Map<OrderItem, Integer> orderHistogram = new HashMap<>();
-        orderHistogram.put(orderItems.get(1), 2);
-        orderHistogram.put(orderItems.get(2), 2);
-        orderHistogram.put(orderItems.get(3), 2);
-        orderHistogram.put(orderItems.get(4), 1);
-        orderHistogram.put(orderItems.get(5), 1);
-        MultiBuyDiscountCalculator calculator = new MultiBuyDiscountCalculator(multiBuyDiscountMultipliers);
+        Map<OrderItem, Integer> orderItemHistogram = new HashMap<>();
+        orderItemHistogram.put(orderItems.get(1), 2);
+        orderItemHistogram.put(orderItems.get(2), 2);
+        orderItemHistogram.put(orderItems.get(3), 2);
+        orderItemHistogram.put(orderItems.get(4), 1);
+        orderItemHistogram.put(orderItems.get(5), 1);
+        MultiBuyDiscountCalculator calculator =
+                new MultiBuyDiscountCalculator(multiBuyDiscountMultipliers, orderItemHistogram);
 
-        Double result = calculator.getLowestCostForBundles(orderHistogram);
+        Double result = calculator.getDiscountedTotalPrice();
         assertEquals(8. * 4 * 0.80 * 2, result, 0.1);
     }
 
 
     @Test
     public void TwoTimes5_bundled_into_5s() {
-        Map<OrderItem, Integer> orderHistogram = new HashMap<>();
-        orderHistogram.put(orderItems.get(1), 2);
-        orderHistogram.put(orderItems.get(2), 3);
-        orderHistogram.put(orderItems.get(3), 2);
-        orderHistogram.put(orderItems.get(4), 3);
-        orderHistogram.put(orderItems.get(5), 2);
-        MultiBuyDiscountCalculator calculator = new MultiBuyDiscountCalculator(multiBuyDiscountMultipliers);
-
+        Map<OrderItem, Integer> orderItemHistogram = new HashMap<>();
+        orderItemHistogram.put(orderItems.get(1), 2);
+        orderItemHistogram.put(orderItems.get(2), 3);
+        orderItemHistogram.put(orderItems.get(3), 2);
+        orderItemHistogram.put(orderItems.get(4), 3);
+        orderItemHistogram.put(orderItems.get(5), 2);
+        MultiBuyDiscountCalculator calculator =
+                new MultiBuyDiscountCalculator(multiBuyDiscountMultipliers, orderItemHistogram);
         //5*2 + 1*2 = 75.2
         //4*3 = 76.8
-        Double result = calculator.getLowestCostForBundles(orderHistogram);
+        Double result = calculator.getDiscountedTotalPrice();
         assertEquals(75.2, result, 0.1);
     }
 
     @Test
     public void UsesBundleOf5_RatherThan4sOnly() {
-        Map<OrderItem, Integer> orderHistogram = new HashMap<>();
-        orderHistogram.put(orderItems.get(1), 2);
-        orderHistogram.put(orderItems.get(2), 3);
-        orderHistogram.put(orderItems.get(3), 2);
-        orderHistogram.put(orderItems.get(4), 4);
-        orderHistogram.put(orderItems.get(5), 1);
-        MultiBuyDiscountCalculator calculator = new MultiBuyDiscountCalculator(multiBuyDiscountMultipliers);
+        Map<OrderItem, Integer> orderItemHistogram = new HashMap<>();
+        orderItemHistogram.put(orderItems.get(1), 2);
+        orderItemHistogram.put(orderItems.get(2), 3);
+        orderItemHistogram.put(orderItems.get(3), 2);
+        orderItemHistogram.put(orderItems.get(4), 4);
+        orderItemHistogram.put(orderItems.get(5), 1);
+        MultiBuyDiscountCalculator calculator =
+                new MultiBuyDiscountCalculator(multiBuyDiscountMultipliers, orderItemHistogram);
 
         Double expectedResult = 5.*8.*0.75 + 4.*8.*0.8 + 2.*8.*0.95 + 1.*8.;
-        Double result = calculator.getLowestCostForBundles(orderHistogram);
+        Double result = calculator.getDiscountedTotalPrice();
         assertEquals(expectedResult, result, 0.1);
     }
 }
