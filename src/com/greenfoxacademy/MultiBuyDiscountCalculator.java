@@ -27,12 +27,12 @@ public class MultiBuyDiscountCalculator {
      */
     public Double getDiscountedTotalPrice() {
         Double lowestDiscountedTotal = Double.MAX_VALUE;
-        List<Pair<Integer, Double>> bundlesWithLowestDiscountedTotalPrice = new ArrayList<>();
+        List<Pair<Integer, Double>> bundlesWithLowestDiscountedTotal = new ArrayList<>();
 
         Map<OrderItem, Integer> histogramCopyForTriedMaxBundleSize;
         int remainingItemCountInHistogramCopy;
         List<Pair<Integer, Double>> bundlesAtFullPriceForTriedMaxBundleSize;
-        Double costForTriedMaxBundleSize;
+        Double discountedTotalForTriedMaxBundleSize;
         int sizeOfThisBundle;
         Double fullPriceOfThisBundle;
         int count;
@@ -68,22 +68,22 @@ public class MultiBuyDiscountCalculator {
                                 .sum();
             }
 
-            costForTriedMaxBundleSize = getDiscountedCostForBundles(bundlesAtFullPriceForTriedMaxBundleSize);
+            discountedTotalForTriedMaxBundleSize = getDiscountedCostForBundles(bundlesAtFullPriceForTriedMaxBundleSize);
 
 //            System.out.println("Tried max bundle size: " + triedMaxBundleSize);
-//            System.out.println("Cost: " + costForTriedMaxBundleSize);
+//            System.out.println("Cost: " + discountedTotalForTriedMaxBundleSize);
 //            System.out.println("Bundles: " + bundlesAtFullPriceForTriedMaxBundleSize);
 
-            if (costForTriedMaxBundleSize < lowestDiscountedTotal) {
-                lowestDiscountedTotal = costForTriedMaxBundleSize;
-                bundlesWithLowestDiscountedTotalPrice = bundlesAtFullPriceForTriedMaxBundleSize;
+            if (discountedTotalForTriedMaxBundleSize < lowestDiscountedTotal) {
+                lowestDiscountedTotal = discountedTotalForTriedMaxBundleSize;
+                bundlesWithLowestDiscountedTotal = bundlesAtFullPriceForTriedMaxBundleSize;
             }
         }
 
         System.out.println("Bundle config with lowest total price of "
                             + lowestDiscountedTotal
                             + ": "
-                            + bundlesWithLowestDiscountedTotalPrice);
+                            + bundlesWithLowestDiscountedTotal);
         return lowestDiscountedTotal;
     }
 
