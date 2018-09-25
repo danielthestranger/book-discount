@@ -5,6 +5,7 @@ import java.util.*;
 public class Main {
 
     static Map<Integer, Double> bundleCosts;
+    static Map<Integer, Double> discountConfig;
 
     static {
         bundleCosts = new HashMap<>();
@@ -13,6 +14,14 @@ public class Main {
         bundleCosts.put(3, 8. * 3 * 0.90);
         bundleCosts.put(4, 8. * 4 * 0.80);
         bundleCosts.put(5, 8. * 5 * 0.75);
+
+        discountConfig = new HashMap<>();
+        discountConfig.put(1, 1.);
+        discountConfig.put(2, 0.95);
+        discountConfig.put(3, 0.90);
+        discountConfig.put(4, 0.80);
+        discountConfig.put(5, 0.75);
+
     }
 
 
@@ -29,11 +38,11 @@ public class Main {
      * @param orderHistogram expects ordered items as keys and their respective counts as values
      * @return The lowest total cost for the optimum bundle combination.
      */
-    public static Double getLowestCostForBundles(Map<String, Integer> orderHistogram) {
+    public static Double getLowestCostForBundles(Map<OrderItem, Integer> orderHistogram) {
         Double lowestOverallCost = Double.MAX_VALUE;
         int histogramSize = orderHistogram.size();
 
-        Map<String, Integer> histogramCopyForTriedMaxBundleSize;
+        Map<OrderItem, Integer> histogramCopyForTriedMaxBundleSize;
         int totalValuesInCopiedHistogram;
         List<Integer> bundlesWithLowestCost = new ArrayList<>();
         List<Integer> bundleSizesForTriedMaxBundleSize;
@@ -51,7 +60,7 @@ public class Main {
                     .mapToInt(Integer::intValue)
                     .sum();
             while (totalValuesInCopiedHistogram > 0) {
-                for (Map.Entry<String, Integer> histogramCopyEntry : histogramCopyForTriedMaxBundleSize.entrySet()) {
+                for (Map.Entry<OrderItem, Integer> histogramCopyEntry : histogramCopyForTriedMaxBundleSize.entrySet()) {
                     currentValueOfEntry = histogramCopyEntry.getValue();
                     if (currentValueOfEntry > 0) {
                         if (sizeOfThisBundle < triedMaxBundleSize) {
@@ -92,5 +101,4 @@ public class Main {
         }
         return overallCost;
     }
-
 }

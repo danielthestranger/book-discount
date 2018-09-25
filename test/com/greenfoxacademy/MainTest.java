@@ -1,5 +1,6 @@
 package com.greenfoxacademy;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
@@ -9,58 +10,62 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class MainTest {
 
-    Double priceForOne = 8.;
+    private OrderItem item1 = new OrderItem("One", 8.);
+    private OrderItem item2 = new OrderItem("Two", 8.);
+    private OrderItem item3 = new OrderItem("Three", 8.);
+    private OrderItem item4 = new OrderItem("Four", 8.);
+    private OrderItem item5 = new OrderItem("Five", 8.);
 
     @Test
     public void oneItemCostsFullPrice() {
-        Map<String, Integer> orderHistogram = new HashMap<>();
-        orderHistogram.put("1", 1);
+        Map<OrderItem, Integer> orderHistogram = new HashMap<>();
+        orderHistogram.put(item1, 1);
 
         Double result = Main.getLowestCostForBundles(orderHistogram);
-        assertEquals(priceForOne, result, 0.1);
+        assertEquals(item1.getPricePerUnit(), result, 0.1);
     }
 
     @Test
     public void twoItemsOfTheSameUseNoDiscount() {
-        Map<String, Integer> orderHistogram = new HashMap<>();
-        orderHistogram.put("1", 2);
+        Map<OrderItem, Integer> orderHistogram = new HashMap<>();
+        orderHistogram.put(item1, 2);
 
         Double result = Main.getLowestCostForBundles(orderHistogram);
-        assertEquals(priceForOne * 2, result, 0.1);
+        assertEquals(item1.getPricePerUnit() * 2, result, 0.1);
     }
 
     @Test
     public void twoDifferentItemsUseLevel1Discount() {
-        Map<String, Integer> orderHistogram = new HashMap<>();
-        orderHistogram.put("1", 1);
-        orderHistogram.put("2", 1);
+        Map<OrderItem, Integer> orderHistogram = new HashMap<>();
+        orderHistogram.put(item1, 1);
+        orderHistogram.put(item2, 1);
 
         Double result = Main.getLowestCostForBundles(orderHistogram);
-        assertEquals(priceForOne * 2 * 0.95, result, 0.1);
+        assertEquals((item1.getPricePerUnit() + item2.getPricePerUnit()) * 0.95, result, 0.1);
     }
 
     @Test
     public void ThreeTimes2_and_2times1_items_AreBundledInto4s() {
-        Map<String, Integer> orderHistogram = new HashMap<>();
-        orderHistogram.put("1", 2);
-        orderHistogram.put("2", 2);
-        orderHistogram.put("3", 2);
-        orderHistogram.put("4", 1);
-        orderHistogram.put("5", 1);
+        Map<OrderItem, Integer> orderHistogram = new HashMap<>();
+        orderHistogram.put(item1, 2);
+        orderHistogram.put(item2, 2);
+        orderHistogram.put(item3, 2);
+        orderHistogram.put(item4, 1);
+        orderHistogram.put(item5, 1);
 
         Double result = Main.getLowestCostForBundles(orderHistogram);
-        assertEquals(priceForOne * 4 * 0.80 * 2, result, 0.1);
+        assertEquals(8. * 4 * 0.80 * 2, result, 0.1);
     }
 
 
     @Test
     public void TwoTimes5_bundled_into_5s() {
-        Map<String, Integer> orderHistogram = new HashMap<>();
-        orderHistogram.put("1", 2);
-        orderHistogram.put("2", 3);
-        orderHistogram.put("3", 2);
-        orderHistogram.put("4", 3);
-        orderHistogram.put("5", 2);
+        Map<OrderItem, Integer> orderHistogram = new HashMap<>();
+        orderHistogram.put(item1, 2);
+        orderHistogram.put(item2, 3);
+        orderHistogram.put(item3, 2);
+        orderHistogram.put(item4, 3);
+        orderHistogram.put(item5, 2);
 
         //5*2 + 1*2 = 75.2
         //4*3 = 76.8
@@ -70,12 +75,12 @@ class MainTest {
 
     @Test
     public void UsesBundleOf5_RatherThan4sOnly() {
-        Map<String, Integer> orderHistogram = new HashMap<>();
-        orderHistogram.put("1", 2);
-        orderHistogram.put("2", 3);
-        orderHistogram.put("3", 2);
-        orderHistogram.put("4", 4);
-        orderHistogram.put("5", 1);
+        Map<OrderItem, Integer> orderHistogram = new HashMap<>();
+        orderHistogram.put(item1, 2);
+        orderHistogram.put(item2, 3);
+        orderHistogram.put(item3, 2);
+        orderHistogram.put(item4, 4);
+        orderHistogram.put(item5, 1);
 
         Double expectedResult = 5.*8.*0.75 + 4.*8.*0.8 + 2.*8.*0.95 + 1.*8.;
         Double result = Main.getLowestCostForBundles(orderHistogram);
