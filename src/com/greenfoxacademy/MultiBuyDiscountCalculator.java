@@ -27,15 +27,15 @@ public class MultiBuyDiscountCalculator {
      */
     public Double getDiscountedTotalPrice() {
         Double lowestDiscountedTotal = Double.MAX_VALUE;
+        List<Pair<Integer, Double>> bundlesWithLowestDiscountedTotalPrice = new ArrayList<>();
 
         Map<OrderItem, Integer> histogramCopyForTriedMaxBundleSize;
         int remainingItemCountInHistogramCopy;
-        List<Pair<Integer, Double>> bundlesWithLowestDiscountedTotalPrice = new ArrayList<>();
         List<Pair<Integer, Double>> bundlesAtFullPriceForTriedMaxBundleSize;
         Double costForTriedMaxBundleSize;
         int sizeOfThisBundle;
         Double fullPriceOfThisBundle;
-        int currentValueOfEntry;
+        int count;
         for (int triedMaxBundleSize = orderItemHistogram.size(); triedMaxBundleSize > 0; triedMaxBundleSize--) {
             bundlesAtFullPriceForTriedMaxBundleSize = new ArrayList<>();
             histogramCopyForTriedMaxBundleSize = new HashMap<>(orderItemHistogram);
@@ -43,18 +43,18 @@ public class MultiBuyDiscountCalculator {
             sizeOfThisBundle = 0;
             fullPriceOfThisBundle = 0.;
             remainingItemCountInHistogramCopy =
-                    histogramCopyForTriedMaxBundleSize
+                            histogramCopyForTriedMaxBundleSize
                             .values().stream()
                             .mapToInt(Integer::intValue)
                             .sum();
             while (remainingItemCountInHistogramCopy > 0) {
-                for (Map.Entry<OrderItem, Integer> histogramCopyEntry : histogramCopyForTriedMaxBundleSize.entrySet()) {
-                    currentValueOfEntry = histogramCopyEntry.getValue();
-                    if (currentValueOfEntry > 0) {
+                for (Map.Entry<OrderItem, Integer> countOfOrderItem : histogramCopyForTriedMaxBundleSize.entrySet()) {
+                    count = countOfOrderItem.getValue();
+                    if (count > 0) {
                         if (sizeOfThisBundle < triedMaxBundleSize) {
                             sizeOfThisBundle++;
-                            fullPriceOfThisBundle = fullPriceOfThisBundle + histogramCopyEntry.getKey().getUnitPrice();
-                            histogramCopyEntry.setValue(currentValueOfEntry - 1);
+                            fullPriceOfThisBundle = fullPriceOfThisBundle + countOfOrderItem.getKey().getUnitPrice();
+                            countOfOrderItem.setValue(count - 1);
                         }
                     }
                 }
@@ -62,7 +62,7 @@ public class MultiBuyDiscountCalculator {
                 sizeOfThisBundle = 0;
                 fullPriceOfThisBundle = 0.;
                 remainingItemCountInHistogramCopy =
-                        histogramCopyForTriedMaxBundleSize
+                                histogramCopyForTriedMaxBundleSize
                                 .values().stream()
                                 .mapToInt(Integer::intValue)
                                 .sum();
