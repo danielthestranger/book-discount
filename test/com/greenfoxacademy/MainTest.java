@@ -1,6 +1,5 @@
 package com.greenfoxacademy;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
@@ -22,7 +21,7 @@ class MainTest {
         orderHistogram.put(item1, 1);
 
         Double result = Main.getLowestCostForBundles(orderHistogram);
-        assertEquals(item1.getPricePerUnit(), result, 0.1);
+        assertEquals(item1.getUnitPrice(), result, 0.1);
     }
 
     @Test
@@ -31,7 +30,7 @@ class MainTest {
         orderHistogram.put(item1, 2);
 
         Double result = Main.getLowestCostForBundles(orderHistogram);
-        assertEquals(item1.getPricePerUnit() * 2, result, 0.1);
+        assertEquals(item1.getUnitPrice() * 2, result, 0.1);
     }
 
     @Test
@@ -41,7 +40,7 @@ class MainTest {
         orderHistogram.put(item2, 1);
 
         Double result = Main.getLowestCostForBundles(orderHistogram);
-        assertEquals((item1.getPricePerUnit() + item2.getPricePerUnit()) * 0.95, result, 0.1);
+        assertEquals((item1.getUnitPrice() + item2.getUnitPrice()) * 0.95, result, 0.1);
     }
 
     @Test

@@ -1,27 +1,20 @@
 package com.greenfoxacademy;
 
+import javafx.util.Pair;
+
 import java.util.*;
 
 public class Main {
 
-    static Map<Integer, Double> bundleCosts;
-    static Map<Integer, Double> discountConfig;
+    static Map<Integer, Double> volumeDiscountConfig;
 
     static {
-        bundleCosts = new HashMap<>();
-        bundleCosts.put(1, 8.);
-        bundleCosts.put(2, 8. * 2 * 0.95);
-        bundleCosts.put(3, 8. * 3 * 0.90);
-        bundleCosts.put(4, 8. * 4 * 0.80);
-        bundleCosts.put(5, 8. * 5 * 0.75);
-
-        discountConfig = new HashMap<>();
-        discountConfig.put(1, 1.);
-        discountConfig.put(2, 0.95);
-        discountConfig.put(3, 0.90);
-        discountConfig.put(4, 0.80);
-        discountConfig.put(5, 0.75);
-
+        volumeDiscountConfig = new HashMap<>();
+        volumeDiscountConfig.put(1, 1.);
+        volumeDiscountConfig.put(2, 0.95);
+        volumeDiscountConfig.put(3, 0.90);
+        volumeDiscountConfig.put(4, 0.80);
+        volumeDiscountConfig.put(5, 0.75);
     }
 
 
@@ -44,16 +37,18 @@ public class Main {
 
         Map<OrderItem, Integer> histogramCopyForTriedMaxBundleSize;
         int totalValuesInCopiedHistogram;
-        List<Integer> bundlesWithLowestCost = new ArrayList<>();
-        List<Integer> bundleSizesForTriedMaxBundleSize;
+        List<Pair<Integer, Double>> bundleCombinationsWithLowestTotalPrice = new ArrayList<>();
+        List<Pair<Integer, Double>> bundlesAtFullPriceForTriedMaxBundleSize;
         Double costForTriedMaxBundleSize;
         int sizeOfThisBundle;
+        Double fullPriceOfThisBundle;
         int currentValueOfEntry;
         for (int triedMaxBundleSize = histogramSize; triedMaxBundleSize > 0; triedMaxBundleSize--) {
-            bundleSizesForTriedMaxBundleSize = new ArrayList<>();
+            bundlesAtFullPriceForTriedMaxBundleSize = new ArrayList<>();
             histogramCopyForTriedMaxBundleSize = new HashMap<>(orderHistogram);
 
             sizeOfThisBundle = 0;
+            fullPriceOfThisBundle = 0.;
             totalValuesInCopiedHistogram =
                     histogramCopyForTriedMaxBundleSize
                     .values().stream()
@@ -65,12 +60,14 @@ public class Main {
                     if (currentValueOfEntry > 0) {
                         if (sizeOfThisBundle < triedMaxBundleSize) {
                             sizeOfThisBundle++;
+                            fullPriceOfThisBundle = fullPriceOfThisBundle + histogramCopyEntry.getKey().getUnitPrice();
                             histogramCopyEntry.setValue(currentValueOfEntry - 1);
                         }
                     }
                 }
-                bundleSizesForTriedMaxBundleSize.add(sizeOfThisBundle);
+                bundlesAtFullPriceForTriedMaxBundleSize.add(new Pair<>(sizeOfThisBundle, fullPriceOfThisBundle));
                 sizeOfThisBundle = 0;
+                fullPriceOfThisBundle = 0.;
                 totalValuesInCopiedHistogram =
                         histogramCopyForTriedMaxBundleSize
                         .values().stream()
@@ -78,26 +75,34 @@ public class Main {
                         .sum();
             }
 
-            costForTriedMaxBundleSize = getCostForBundles(bundleSizesForTriedMaxBundleSize);
+            costForTriedMaxBundleSize = getDiscountedCostForBundles(
+                                            bundlesAtFullPriceForTriedMaxBundleSize,
+                                            Main.volumeDiscountConfig);
 
 //            System.out.println("Tried max bundle size: " + triedMaxBundleSize);
 //            System.out.println("Cost: " + costForTriedMaxBundleSize);
-//            System.out.println("Bundles: " + bundleSizesForTriedMaxBundleSize);
+//            System.out.println("Bundles: " + bundlesAtFullPriceForTriedMaxBundleSize);
 
             if (costForTriedMaxBundleSize < lowestOverallCost) {
                 lowestOverallCost = costForTriedMaxBundleSize;
-                bundlesWithLowestCost = bundleSizesForTriedMaxBundleSize;
+                bundleCombinationsWithLowestTotalPrice = bundlesAtFullPriceForTriedMaxBundleSize;
             }
         }
 
-        System.out.println("Bundle config with lowest cost of " + lowestOverallCost + ": " + bundlesWithLowestCost);
+        System.out.println("Bundle config with lowest cost of " + lowestOverallCost + ": " + bundleCombinationsWithLowestTotalPrice);
         return lowestOverallCost;
     }
 
-    private static Double getCostForBundles(List<Integer> bundleSizes) {
+    private static Double getDiscountedCostForBundles(List<Pair<Integer, Double>> bundlesWithFullPrice,
+                                                      Map<Integer, Double> volumeDiscountConfig) {
         Double overallCost = 0.;
-        for (Integer bundleSize : bundleSizes) {
-            overallCost += bundleCosts.get(bundleSize);
+
+        Double fullPriceForBundle = 0.;
+        Integer bundleSize = 0;
+        for (Pair<Integer, Double> oneBundleWithFullPrice : bundlesWithFullPrice) {
+            fullPriceForBundle = oneBundleWithFullPrice.getValue();
+            bundleSize = oneBundleWithFullPrice.getKey();
+            overallCost += fullPriceForBundle * volumeDiscountConfig.get(bundleSize);
         }
         return overallCost;
     }

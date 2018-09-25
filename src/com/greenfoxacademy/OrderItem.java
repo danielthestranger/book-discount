@@ -2,15 +2,15 @@ package com.greenfoxacademy;
 
 public class OrderItem {
     private String id;
-    private Double pricePerUnit;
+    private Double unitPrice;
 
     public OrderItem() {
     }
 
-    public OrderItem(String id, Double pricePerUnit) {
+    public OrderItem(String id, Double unitPrice) {
         this();
         this.id = id;
-        this.pricePerUnit = pricePerUnit;
+        this.unitPrice = unitPrice;
     }
 
     public String getId() {
@@ -21,12 +21,12 @@ public class OrderItem {
         this.id = id;
     }
 
-    public Double getPricePerUnit() {
-        return pricePerUnit;
+    public Double getUnitPrice() {
+        return unitPrice;
     }
 
-    public void setPricePerUnit(Double pricePerUnit) {
-        this.pricePerUnit = pricePerUnit;
+    public void setUnitPrice(Double unitPrice) {
+        this.unitPrice = unitPrice;
     }
 
     @Override
