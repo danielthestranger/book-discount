@@ -11,13 +11,8 @@ public class MultiBuyDiscountCalculator {
 
     private Map<Integer, Double> multiBuyDiscountMultipliers;
 
-    public MultiBuyDiscountCalculator() {
-        multiBuyDiscountMultipliers = new HashMap<>();
-        multiBuyDiscountMultipliers.put(1, 1.);
-        multiBuyDiscountMultipliers.put(2, 0.95);
-        multiBuyDiscountMultipliers.put(3, 0.90);
-        multiBuyDiscountMultipliers.put(4, 0.80);
-        multiBuyDiscountMultipliers.put(5, 0.75);
+    public MultiBuyDiscountCalculator(Map<Integer, Double> multiBuyDiscountMultipliers) {
+        this.multiBuyDiscountMultipliers = multiBuyDiscountMultipliers;
     }
 
     /** For each possible max bundle size, it internally creates a list of achievable bundles.
