@@ -15,7 +15,7 @@ class MultiBuyDiscountTests {
 
     public MultiBuyDiscountTests() {
         orderItems = new ArrayList<>();
-        orderItems.add(new OrderItem("Dummy", 0.));
+        orderItems.add(new OrderItem("DummyFor0Index", 0.));
         orderItems.add(new OrderItem("One", 8.));
         orderItems.add(new OrderItem("Two", 8.));
         orderItems.add(new OrderItem("Three", 8.));

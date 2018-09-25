@@ -1,7 +1,6 @@
 package com.greenfoxacademy;
 
 import javafx.util.Pair;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -27,29 +26,28 @@ public class MultiBuyDiscountCalculator {
      * @return The lowest total cost for the optimum bundle combination.
      */
     public Double getDiscountedTotalPrice() {
-        Double lowestOverallCost = Double.MAX_VALUE;
-        int histogramSize = orderItemHistogram.size();
+        Double lowestDiscountedTotal = Double.MAX_VALUE;
 
         Map<OrderItem, Integer> histogramCopyForTriedMaxBundleSize;
-        int totalValuesInCopiedHistogram;
-        List<Pair<Integer, Double>> bundleCombinationsWithLowestTotalPrice = new ArrayList<>();
+        int remainingItemCountInHistogramCopy;
+        List<Pair<Integer, Double>> bundlesWithLowestDiscountedTotalPrice = new ArrayList<>();
         List<Pair<Integer, Double>> bundlesAtFullPriceForTriedMaxBundleSize;
         Double costForTriedMaxBundleSize;
         int sizeOfThisBundle;
         Double fullPriceOfThisBundle;
         int currentValueOfEntry;
-        for (int triedMaxBundleSize = histogramSize; triedMaxBundleSize > 0; triedMaxBundleSize--) {
+        for (int triedMaxBundleSize = orderItemHistogram.size(); triedMaxBundleSize > 0; triedMaxBundleSize--) {
             bundlesAtFullPriceForTriedMaxBundleSize = new ArrayList<>();
             histogramCopyForTriedMaxBundleSize = new HashMap<>(orderItemHistogram);
 
             sizeOfThisBundle = 0;
             fullPriceOfThisBundle = 0.;
-            totalValuesInCopiedHistogram =
+            remainingItemCountInHistogramCopy =
                     histogramCopyForTriedMaxBundleSize
                             .values().stream()
                             .mapToInt(Integer::intValue)
                             .sum();
-            while (totalValuesInCopiedHistogram > 0) {
+            while (remainingItemCountInHistogramCopy > 0) {
                 for (Map.Entry<OrderItem, Integer> histogramCopyEntry : histogramCopyForTriedMaxBundleSize.entrySet()) {
                     currentValueOfEntry = histogramCopyEntry.getValue();
                     if (currentValueOfEntry > 0) {
@@ -63,7 +61,7 @@ public class MultiBuyDiscountCalculator {
                 bundlesAtFullPriceForTriedMaxBundleSize.add(new Pair<>(sizeOfThisBundle, fullPriceOfThisBundle));
                 sizeOfThisBundle = 0;
                 fullPriceOfThisBundle = 0.;
-                totalValuesInCopiedHistogram =
+                remainingItemCountInHistogramCopy =
                         histogramCopyForTriedMaxBundleSize
                                 .values().stream()
                                 .mapToInt(Integer::intValue)
@@ -76,17 +74,17 @@ public class MultiBuyDiscountCalculator {
 //            System.out.println("Cost: " + costForTriedMaxBundleSize);
 //            System.out.println("Bundles: " + bundlesAtFullPriceForTriedMaxBundleSize);
 
-            if (costForTriedMaxBundleSize < lowestOverallCost) {
-                lowestOverallCost = costForTriedMaxBundleSize;
-                bundleCombinationsWithLowestTotalPrice = bundlesAtFullPriceForTriedMaxBundleSize;
+            if (costForTriedMaxBundleSize < lowestDiscountedTotal) {
+                lowestDiscountedTotal = costForTriedMaxBundleSize;
+                bundlesWithLowestDiscountedTotalPrice = bundlesAtFullPriceForTriedMaxBundleSize;
             }
         }
 
         System.out.println("Bundle config with lowest total price of "
-                + lowestOverallCost
-                + ": "
-                + bundleCombinationsWithLowestTotalPrice);
-        return lowestOverallCost;
+                            + lowestDiscountedTotal
+                            + ": "
+                            + bundlesWithLowestDiscountedTotalPrice);
+        return lowestDiscountedTotal;
     }
 
     private Double getDiscountedCostForBundles(List<Pair<Integer, Double>> bundleSizesWithFullPrice) {
@@ -103,7 +101,7 @@ public class MultiBuyDiscountCalculator {
     }
 
     private Double getDiscountedCostForBundle(Integer bundleSize, Double fullPriceOfBundle) {
-        return fullPriceOfBundle * multiBuyDiscountMultipliers.get(bundleSize);
+        return  multiBuyDiscountMultipliers.get(bundleSize) * fullPriceOfBundle;
     }
 
 }
