@@ -6,17 +6,16 @@ import java.util.*;
 
 public class Main {
 
-    static Map<Integer, Double> volumeDiscountConfig;
+    static Map<Integer, Double> multiBuyDiscountMultipliers;
 
     static {
-        volumeDiscountConfig = new HashMap<>();
-        volumeDiscountConfig.put(1, 1.);
-        volumeDiscountConfig.put(2, 0.95);
-        volumeDiscountConfig.put(3, 0.90);
-        volumeDiscountConfig.put(4, 0.80);
-        volumeDiscountConfig.put(5, 0.75);
+        multiBuyDiscountMultipliers = new HashMap<>();
+        multiBuyDiscountMultipliers.put(1, 1.);
+        multiBuyDiscountMultipliers.put(2, 0.95);
+        multiBuyDiscountMultipliers.put(3, 0.90);
+        multiBuyDiscountMultipliers.put(4, 0.80);
+        multiBuyDiscountMultipliers.put(5, 0.75);
     }
-
 
     public static void main(String[] args) {
 
@@ -26,14 +25,14 @@ public class Main {
      *  E.g. for 8 order items altogether, for a max bundle size of 5 it may generate [5, 3], and for 4, [4, 4]
      *  (as long as these combinations are possible).
      *
-     *  For each such bundle combination, it determines which combination has the lowest overall cost.
+     *  For each such bundle combination, it determines which combination has the lowest overall price.
      *
-     * @param orderHistogram expects ordered items as keys and their respective counts as values
+     * @param orderItemHistogram expects OrderItem as keys and their respective counts as values
      * @return The lowest total cost for the optimum bundle combination.
      */
-    public static Double getLowestCostForBundles(Map<OrderItem, Integer> orderHistogram) {
+    public static Double getLowestCostForBundles(Map<OrderItem, Integer> orderItemHistogram) {
         Double lowestOverallCost = Double.MAX_VALUE;
-        int histogramSize = orderHistogram.size();
+        int histogramSize = orderItemHistogram.size();
 
         Map<OrderItem, Integer> histogramCopyForTriedMaxBundleSize;
         int totalValuesInCopiedHistogram;
@@ -45,7 +44,7 @@ public class Main {
         int currentValueOfEntry;
         for (int triedMaxBundleSize = histogramSize; triedMaxBundleSize > 0; triedMaxBundleSize--) {
             bundlesAtFullPriceForTriedMaxBundleSize = new ArrayList<>();
-            histogramCopyForTriedMaxBundleSize = new HashMap<>(orderHistogram);
+            histogramCopyForTriedMaxBundleSize = new HashMap<>(orderItemHistogram);
 
             sizeOfThisBundle = 0;
             fullPriceOfThisBundle = 0.;
@@ -77,7 +76,7 @@ public class Main {
 
             costForTriedMaxBundleSize = getDiscountedCostForBundles(
                                             bundlesAtFullPriceForTriedMaxBundleSize,
-                                            Main.volumeDiscountConfig);
+                                            Main.multiBuyDiscountMultipliers);
 
 //            System.out.println("Tried max bundle size: " + triedMaxBundleSize);
 //            System.out.println("Cost: " + costForTriedMaxBundleSize);
@@ -89,21 +88,30 @@ public class Main {
             }
         }
 
-        System.out.println("Bundle config with lowest cost of " + lowestOverallCost + ": " + bundleCombinationsWithLowestTotalPrice);
+        System.out.println("Bundle config with lowest total price of "
+                            + lowestOverallCost
+                            + ": "
+                            + bundleCombinationsWithLowestTotalPrice);
         return lowestOverallCost;
     }
 
-    private static Double getDiscountedCostForBundles(List<Pair<Integer, Double>> bundlesWithFullPrice,
-                                                      Map<Integer, Double> volumeDiscountConfig) {
+    private static Double getDiscountedCostForBundles(List<Pair<Integer, Double>> bundleSizesWithFullPrice,
+                                                      Map<Integer, Double> multiBuyDiscountMultipliers) {
         Double overallCost = 0.;
 
-        Double fullPriceForBundle = 0.;
+        Double fullPriceOfBundle = 0.;
         Integer bundleSize = 0;
-        for (Pair<Integer, Double> oneBundleWithFullPrice : bundlesWithFullPrice) {
-            fullPriceForBundle = oneBundleWithFullPrice.getValue();
+        for (Pair<Integer, Double> oneBundleWithFullPrice : bundleSizesWithFullPrice) {
+            fullPriceOfBundle = oneBundleWithFullPrice.getValue();
             bundleSize = oneBundleWithFullPrice.getKey();
-            overallCost += fullPriceForBundle * volumeDiscountConfig.get(bundleSize);
+            overallCost += getDiscountedCostForBundle(fullPriceOfBundle, bundleSize, multiBuyDiscountMultipliers);
         }
         return overallCost;
+    }
+
+    private static Double getDiscountedCostForBundle(Double fullPriceOfBundle,
+                                                     Integer bundleSize,
+                                                     Map<Integer, Double> multiBuyDiscountMultipliers) {
+        return fullPriceOfBundle * multiBuyDiscountMultipliers.get(bundleSize);
     }
 }
