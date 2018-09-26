@@ -1,13 +1,13 @@
 package com.greenfoxacademy;
 
-public class OrderItem {
+public class Product {
     private String id;
     private Double unitPrice;
 
-    public OrderItem() {
+    public Product() {
     }
 
-    public OrderItem(String id, Double unitPrice) {
+    public Product(String id, Double unitPrice) {
         this();
         this.id = id;
         this.unitPrice = unitPrice;
@@ -34,10 +34,10 @@ public class OrderItem {
         if (o == this) {
             return true;
         }
-        if (!(o instanceof OrderItem)) {
+        if (!(o instanceof Product)) {
             return false;
         }
-        OrderItem other = (OrderItem) o;
+        Product other = (Product) o;
         return other.getId() == this.id;
     }
 

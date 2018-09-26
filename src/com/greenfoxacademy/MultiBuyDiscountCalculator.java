@@ -7,16 +7,16 @@ import java.util.*;
 public class MultiBuyDiscountCalculator {
 
     private Map<Integer, Double> multiBuyDiscountMultipliers;
-    private Map<OrderItem, Integer> orderItemHistogram;
+    private Map<Product, Integer> productHistogram;
 
     public MultiBuyDiscountCalculator(Map<Integer, Double> multiBuyDiscountMultipliers,
-                                      Map<OrderItem, Integer> orderItemHistogram) {
+                                      Map<Product, Integer> productHistogram) {
         this.multiBuyDiscountMultipliers = multiBuyDiscountMultipliers;
-        this.orderItemHistogram = orderItemHistogram;
+        this.productHistogram = productHistogram;
     }
 
-    /** For each possible max bundle size, it internally creates a list of achievable bundles.
-     *  E.g. for 8 order items altogether, for a max bundle size of 5 it may generate [5, 3], and for 4, [4, 4]
+    /** For each possible max bundle size, it internally creates a list of achievable bundles of distinct products.
+     *  E.g. for 8 products altogether, for a max bundle size of 5 it may generate [5, 3], and for 4, [4, 4]
      *  (as long as these combinations are possible).
      *
      *  For each such bundle combination, it determines which combination has the lowest overall price.
@@ -28,9 +28,9 @@ public class MultiBuyDiscountCalculator {
         List<Pair<Integer, Double>> bundlesWithLowestDiscountedTotal = new ArrayList<>();
 
         Integer largestBundleSizeWithDiscountMultiplier = Collections.max(multiBuyDiscountMultipliers.keySet());
-        int bundleSizesToTry = Math.min(orderItemHistogram.size(), largestBundleSizeWithDiscountMultiplier);
+        int bundleSizesToTry = Math.min(productHistogram.size(), largestBundleSizeWithDiscountMultiplier);
 
-        Map<OrderItem, Integer> histogramCopyForTriedMaxBundleSize;
+        Map<Product, Integer> histogramCopyForTriedMaxBundleSize;
         int remainingItemCountInHistogramCopy;
         List<Pair<Integer, Double>> bundlesAtFullPriceForTriedMaxBundleSize;
         Double discountedTotalForTriedMaxBundleSize;
@@ -39,7 +39,7 @@ public class MultiBuyDiscountCalculator {
         int count;
         for (int triedMaxBundleSize = bundleSizesToTry; triedMaxBundleSize > 0; triedMaxBundleSize--) {
             bundlesAtFullPriceForTriedMaxBundleSize = new ArrayList<>();
-            histogramCopyForTriedMaxBundleSize = new HashMap<>(orderItemHistogram);
+            histogramCopyForTriedMaxBundleSize = new HashMap<>(productHistogram);
 
             sizeOfThisBundle = 0;
             fullPriceOfThisBundle = 0.;
@@ -49,13 +49,13 @@ public class MultiBuyDiscountCalculator {
                             .mapToInt(Integer::intValue)
                             .sum();
             while (remainingItemCountInHistogramCopy > 0) {
-                for (Map.Entry<OrderItem, Integer> countOfOrderItem : histogramCopyForTriedMaxBundleSize.entrySet()) {
-                    count = countOfOrderItem.getValue();
+                for (Map.Entry<Product, Integer> countOfProduct : histogramCopyForTriedMaxBundleSize.entrySet()) {
+                    count = countOfProduct.getValue();
                     if (count > 0) {
                         if (sizeOfThisBundle < triedMaxBundleSize) {
                             sizeOfThisBundle++;
-                            fullPriceOfThisBundle = fullPriceOfThisBundle + countOfOrderItem.getKey().getUnitPrice();
-                            countOfOrderItem.setValue(count - 1);
+                            fullPriceOfThisBundle = fullPriceOfThisBundle + countOfProduct.getKey().getUnitPrice();
+                            countOfProduct.setValue(count - 1);
                         }
                     }
                 }
