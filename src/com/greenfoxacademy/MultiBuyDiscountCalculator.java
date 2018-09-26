@@ -9,100 +9,102 @@ public class MultiBuyDiscountCalculator {
     private Map<Integer, Double> multiBuyDiscountMultipliers;
     private Map<Product, Integer> productHistogram;
 
-    public MultiBuyDiscountCalculator(Map<Integer, Double> multiBuyDiscountMultipliers,
-                                      Map<Product, Integer> productHistogram) {
+    public MultiBuyDiscountCalculator(
+            Map<Integer, Double> multiBuyDiscountMultipliers,
+            Map<Product, Integer> productHistogram)
+    {
         this.multiBuyDiscountMultipliers = multiBuyDiscountMultipliers;
         this.productHistogram = productHistogram;
     }
 
-    /** For each possible max set size, it internally creates a list of achievable sets of distinct products.
-     *  E.g. for 8 products altogether, for a max set size of 5 it may generate [5, 3], and for 4, [4, 4]
+    /** For each possible max bund  le size, it internally creates a list of achievable bundles of distinct products.
+     *  E.g. for 8 products altogether, for a max bundle size of 5 it may generate [5, 3], and for 4, [4, 4]
      *  (as long as these combinations are possible).
      *
-     *  For each such set combination, it determines which combination has the lowest overall price.
+     *  For each such bundle combination, it determines which combination has the lowest overall price.
      *
-     * @return The lowest total cost for the optimum set combination.
+     * @return The lowest total cost for the optimum bundle combination.
      */
     public Double getDiscountedTotalPrice() {
         Double lowestDiscountedTotal = Double.MAX_VALUE;
-        List<Pair<Integer, Double>> setsWithLowestDiscountedTotal = new ArrayList<>();
+        List<Pair<Integer, Double>> bundlesWithLowestDiscountedTotal = new ArrayList<>();
 
-        int largestSetSizeWithDiscountMultiplier = Collections.max(multiBuyDiscountMultipliers.keySet());
-        int setSizesToTry = Math.min(productHistogram.size(), largestSetSizeWithDiscountMultiplier);
+        int largestBundleSizeWithDiscountMultiplier = Collections.max(multiBuyDiscountMultipliers.keySet());
+        int bundleSizesToTry = Math.min(productHistogram.size(), largestBundleSizeWithDiscountMultiplier);
 
-        Map<Product, Integer> histogramCopyForTriedMaxSetSize;
-        int remainingItemCountInHistogramCopy;
-        List<Pair<Integer, Double>> setsAtFullPriceForTriedMaxSetSize;
-        Double discountedTotalForTriedMaxSetSize;
-        int sizeOfThisSet;
-        Double fullPriceOfThisSet;
+        Map<Product, Integer> histogramCopyForTriedMaxBundleSize;
+        int remainingProductCountInHistogramCopy;
+        List<Pair<Integer, Double>> bundlesAtFullPriceForTriedMaxBundleSize;
+        Double discountedTotalForTriedMaxBundleSize;
+        int sizeOfThisBundle;
+        Double fullPriceOfThisBundle;
         int count;
-        for (int triedMaxSetSize = setSizesToTry; triedMaxSetSize > 0; triedMaxSetSize--) {
-            setsAtFullPriceForTriedMaxSetSize = new ArrayList<>();
-            histogramCopyForTriedMaxSetSize = new HashMap<>(productHistogram);
+        for (int triedMaxBundleSize = bundleSizesToTry; triedMaxBundleSize > 0; triedMaxBundleSize--) {
+            bundlesAtFullPriceForTriedMaxBundleSize = new ArrayList<>();
+            histogramCopyForTriedMaxBundleSize = new HashMap<>(productHistogram);
 
-            sizeOfThisSet = 0;
-            fullPriceOfThisSet = 0.;
-            remainingItemCountInHistogramCopy =
-                            histogramCopyForTriedMaxSetSize
+            sizeOfThisBundle = 0;
+            fullPriceOfThisBundle = 0.;
+            remainingProductCountInHistogramCopy =
+                            histogramCopyForTriedMaxBundleSize
                             .values().stream()
                             .mapToInt(Integer::intValue)
                             .sum();
-            while (remainingItemCountInHistogramCopy > 0) {
-                for (Map.Entry<Product, Integer> countOfProduct : histogramCopyForTriedMaxSetSize.entrySet()) {
+            while (remainingProductCountInHistogramCopy > 0) {
+                for (Map.Entry<Product, Integer> countOfProduct : histogramCopyForTriedMaxBundleSize.entrySet()) {
                     count = countOfProduct.getValue();
                     if (count > 0) {
-                        if (sizeOfThisSet < triedMaxSetSize) {
-                            sizeOfThisSet++;
-                            fullPriceOfThisSet = fullPriceOfThisSet + countOfProduct.getKey().getUnitPrice();
+                        if (sizeOfThisBundle < triedMaxBundleSize) {
+                            sizeOfThisBundle++;
+                            fullPriceOfThisBundle = fullPriceOfThisBundle + countOfProduct.getKey().getUnitPrice();
                             countOfProduct.setValue(count - 1);
                         }
                     }
                 }
-                setsAtFullPriceForTriedMaxSetSize.add(new Pair<>(sizeOfThisSet, fullPriceOfThisSet));
-                sizeOfThisSet = 0;
-                fullPriceOfThisSet = 0.;
-                remainingItemCountInHistogramCopy =
-                                histogramCopyForTriedMaxSetSize
+                bundlesAtFullPriceForTriedMaxBundleSize.add(new Pair<>(sizeOfThisBundle, fullPriceOfThisBundle));
+                sizeOfThisBundle = 0;
+                fullPriceOfThisBundle = 0.;
+                remainingProductCountInHistogramCopy =
+                                histogramCopyForTriedMaxBundleSize
                                 .values().stream()
                                 .mapToInt(Integer::intValue)
                                 .sum();
             }
 
-            discountedTotalForTriedMaxSetSize = getDiscountedTotalForSets(setsAtFullPriceForTriedMaxSetSize);
+            discountedTotalForTriedMaxBundleSize = getDiscountedTotalForBundles(bundlesAtFullPriceForTriedMaxBundleSize);
 
-//            System.out.println("Tried max set size: " + triedMaxSetSize);
-//            System.out.println("Cost: " + discountedTotalForTriedMaxSetSize);
-//            System.out.println("Sets: " + setsAtFullPriceForTriedMaxSetSize);
+//            System.out.println("Tried max bundle size: " + triedMaxBundleSize);
+//            System.out.println("Cost: " + discountedTotalForTriedMaxBundleSize);
+//            System.out.println("Bundles: " + bundlesAtFullPriceForTriedMaxBundleSize);
 
-            if (discountedTotalForTriedMaxSetSize < lowestDiscountedTotal) {
-                lowestDiscountedTotal = discountedTotalForTriedMaxSetSize;
-                setsWithLowestDiscountedTotal = setsAtFullPriceForTriedMaxSetSize;
+            if (discountedTotalForTriedMaxBundleSize < lowestDiscountedTotal) {
+                lowestDiscountedTotal = discountedTotalForTriedMaxBundleSize;
+                bundlesWithLowestDiscountedTotal = bundlesAtFullPriceForTriedMaxBundleSize;
             }
         }
 
-        System.out.println("Set config with lowest total price of "
+        System.out.println("Bundle config with lowest total price of "
                             + lowestDiscountedTotal
                             + ": "
-                            + setsWithLowestDiscountedTotal);
+                            + bundlesWithLowestDiscountedTotal);
         return lowestDiscountedTotal;
     }
 
-    private Double getDiscountedTotalForSets(List<Pair<Integer, Double>> setSizesWithFullPrice) {
+    private Double getDiscountedTotalForBundles(List<Pair<Integer, Double>> bundleSizesWithFullPrice) {
         Double discountedTotal = 0.;
 
-        Double fullPriceOfSet = 0.;
-        Integer setSize = 0;
-        for (Pair<Integer, Double> oneSetWithFullPrice : setSizesWithFullPrice) {
-            fullPriceOfSet = oneSetWithFullPrice.getValue();
-            setSize = oneSetWithFullPrice.getKey();
-            discountedTotal += getDiscountedTotalForSet(setSize, fullPriceOfSet);
+        Double fullPriceOfBundle = 0.;
+        Integer bundleSize = 0;
+        for (Pair<Integer, Double> oneBundleWithFullPrice : bundleSizesWithFullPrice) {
+            fullPriceOfBundle = oneBundleWithFullPrice.getValue();
+            bundleSize = oneBundleWithFullPrice.getKey();
+            discountedTotal += getDiscountedTotalForBundle(bundleSize, fullPriceOfBundle);
         }
         return discountedTotal;
     }
 
-    private Double getDiscountedTotalForSet(Integer setSize, Double fullPriceOfSet) {
-        return  multiBuyDiscountMultipliers.getOrDefault(setSize, 1.) * fullPriceOfSet;
+    private Double getDiscountedTotalForBundle(Integer bundleSize, Double fullPriceOfBundle) {
+        return  multiBuyDiscountMultipliers.getOrDefault(bundleSize, 1.) * fullPriceOfBundle;
     }
 
 }
