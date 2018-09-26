@@ -1,10 +1,8 @@
 package com.greenfoxacademy;
 
 import javafx.util.Pair;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
+import java.util.*;
 
 public class MultiBuyDiscountCalculator {
 
@@ -29,6 +27,9 @@ public class MultiBuyDiscountCalculator {
         Double lowestDiscountedTotal = Double.MAX_VALUE;
         List<Pair<Integer, Double>> bundlesWithLowestDiscountedTotal = new ArrayList<>();
 
+        Integer largestBundleSizeWithDiscountMultiplier = Collections.max(multiBuyDiscountMultipliers.keySet());
+        int bundleSizesToTry = Math.min(orderItemHistogram.size(), largestBundleSizeWithDiscountMultiplier);
+
         Map<OrderItem, Integer> histogramCopyForTriedMaxBundleSize;
         int remainingItemCountInHistogramCopy;
         List<Pair<Integer, Double>> bundlesAtFullPriceForTriedMaxBundleSize;
@@ -36,7 +37,7 @@ public class MultiBuyDiscountCalculator {
         int sizeOfThisBundle;
         Double fullPriceOfThisBundle;
         int count;
-        for (int triedMaxBundleSize = orderItemHistogram.size(); triedMaxBundleSize > 0; triedMaxBundleSize--) {
+        for (int triedMaxBundleSize = bundleSizesToTry; triedMaxBundleSize > 0; triedMaxBundleSize--) {
             bundlesAtFullPriceForTriedMaxBundleSize = new ArrayList<>();
             histogramCopyForTriedMaxBundleSize = new HashMap<>(orderItemHistogram);
 
@@ -101,7 +102,7 @@ public class MultiBuyDiscountCalculator {
     }
 
     private Double getDiscountedTotalForBundle(Integer bundleSize, Double fullPriceOfBundle) {
-        return  multiBuyDiscountMultipliers.get(bundleSize) * fullPriceOfBundle;
+        return  multiBuyDiscountMultipliers.getOrDefault(bundleSize, 1.) * fullPriceOfBundle;
     }
 
 }
